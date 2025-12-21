@@ -20,9 +20,14 @@ go.work
 # IDE specific files
 .idea/
 .vscode/
+.cursor/
 *.swp
 *.swo
 *~
+
+# Claude and documentation
+.gdndocs/
+.claude/
 
 # OS specific files
 .DS_Store
