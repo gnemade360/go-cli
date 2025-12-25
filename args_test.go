@@ -22,11 +22,11 @@ func TestExactArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := NewCommand(
-				WithUse("test"),
-				WithArgs(ExactArgs(tt.n)),
+				WithName("test"),
+				WithArgValidator(ExactArgs(tt.n)),
 			)
 
-			err := cmd.args(cmd, tt.args)
+			err := cmd.argValidation(cmd, tt.args)
 			if (err != nil) != tt.wantError {
 				t.Errorf("ExactArgs(%d) with %d args: error = %v, wantError %v",
 					tt.n, len(tt.args), err, tt.wantError)
@@ -51,11 +51,11 @@ func TestMinimumNArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := NewCommand(
-				WithUse("test"),
-				WithArgs(MinimumNArgs(tt.n)),
+				WithName("test"),
+				WithArgValidator(MinimumNArgs(tt.n)),
 			)
 
-			err := cmd.args(cmd, tt.args)
+			err := cmd.argValidation(cmd, tt.args)
 			if (err != nil) != tt.wantError {
 				t.Errorf("MinimumNArgs(%d) with %d args: error = %v, wantError %v",
 					tt.n, len(tt.args), err, tt.wantError)
@@ -81,11 +81,11 @@ func TestMaximumNArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := NewCommand(
-				WithUse("test"),
-				WithArgs(MaximumNArgs(tt.n)),
+				WithName("test"),
+				WithArgValidator(MaximumNArgs(tt.n)),
 			)
 
-			err := cmd.args(cmd, tt.args)
+			err := cmd.argValidation(cmd, tt.args)
 			if (err != nil) != tt.wantError {
 				t.Errorf("MaximumNArgs(%d) with %d args: error = %v, wantError %v",
 					tt.n, len(tt.args), err, tt.wantError)
@@ -112,11 +112,11 @@ func TestRangeArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := NewCommand(
-				WithUse("test"),
-				WithArgs(RangeArgs(tt.min, tt.max)),
+				WithName("test"),
+				WithArgValidator(RangeArgs(tt.min, tt.max)),
 			)
 
-			err := cmd.args(cmd, tt.args)
+			err := cmd.argValidation(cmd, tt.args)
 			if (err != nil) != tt.wantError {
 				t.Errorf("RangeArgs(%d, %d) with %d args: error = %v, wantError %v",
 					tt.min, tt.max, len(tt.args), err, tt.wantError)
@@ -142,12 +142,12 @@ func TestOnlyValidArgs(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			cmd := NewCommand(
-				WithUse("test"),
-				WithValidArgs(tt.validArgs...),
-				WithArgs(OnlyValidArgs()),
+				WithName("test"),
+				WithAllowedArgs(tt.validArgs...),
+				WithArgValidator(OnlyValidArgs()),
 			)
 
-			err := cmd.args(cmd, tt.args)
+			err := cmd.argValidation(cmd, tt.args)
 			if (err != nil) != tt.wantError {
 				t.Errorf("OnlyValidArgs() with args %v: error = %v, wantError %v",
 					tt.args, err, tt.wantError)
@@ -159,14 +159,14 @@ func TestOnlyValidArgs(t *testing.T) {
 func TestMatchAll(t *testing.T) {
 	t.Run("all validators pass", func(t *testing.T) {
 		cmd := NewCommand(
-			WithUse("test"),
-			WithArgs(MatchAll(
+			WithName("test"),
+			WithArgValidator(MatchAll(
 				MinimumNArgs(1),
 				MaximumNArgs(3),
 			)),
 		)
 
-		err := cmd.args(cmd, []string{"a", "b"})
+		err := cmd.argValidation(cmd, []string{"a", "b"})
 		if err != nil {
 			t.Errorf("MatchAll should pass, got error: %v", err)
 		}
@@ -174,14 +174,14 @@ func TestMatchAll(t *testing.T) {
 
 	t.Run("first validator fails", func(t *testing.T) {
 		cmd := NewCommand(
-			WithUse("test"),
-			WithArgs(MatchAll(
+			WithName("test"),
+			WithArgValidator(MatchAll(
 				MinimumNArgs(3),
 				MaximumNArgs(5),
 			)),
 		)
 
-		err := cmd.args(cmd, []string{"a"})
+		err := cmd.argValidation(cmd, []string{"a"})
 		if err == nil {
 			t.Error("MatchAll should fail on first validator")
 		}
@@ -189,14 +189,14 @@ func TestMatchAll(t *testing.T) {
 
 	t.Run("second validator fails", func(t *testing.T) {
 		cmd := NewCommand(
-			WithUse("test"),
-			WithArgs(MatchAll(
+			WithName("test"),
+			WithArgValidator(MatchAll(
 				MinimumNArgs(1),
 				MaximumNArgs(2),
 			)),
 		)
 
-		err := cmd.args(cmd, []string{"a", "b", "c"})
+		err := cmd.argValidation(cmd, []string{"a", "b", "c"})
 		if err == nil {
 			t.Error("MatchAll should fail on second validator")
 		}
@@ -207,8 +207,8 @@ func TestArgsValidation_Integration(t *testing.T) {
 	executed := false
 
 	cmd := NewCommand(
-		WithUse("test"),
-		WithArgs(ExactArgs(2)),
+		WithName("test"),
+		WithArgValidator(ExactArgs(2)),
 		WithRun(func(cmd *Command, args []string) error {
 			executed = true
 			return nil

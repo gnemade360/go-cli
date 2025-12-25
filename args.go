@@ -53,10 +53,10 @@ func RangeArgs(min, max int) ArgsValidator {
 func OnlyValidArgs() ArgsValidator {
 	return func(cmd *Command, args []string) error {
 		for _, arg := range args {
-			if !contains(cmd.validArgs, arg) {
+			if !contains(cmd.allowedArgs, arg) {
 				return &InvalidArgError{
-					Arg:        arg,
-					ValidArgs:  cmd.validArgs,
+					Arg:       arg,
+					ValidArgs: cmd.allowedArgs,
 				}
 			}
 		}

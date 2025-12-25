@@ -18,14 +18,14 @@ func main() {
 	)
 
 	rootCmd := gocli.NewCommand(
-		gocli.WithUse("myapp"),
+		gocli.WithName("myapp"),
 		gocli.WithShort("Application with configuration support"),
 		gocli.WithLong("Demonstrates go-cli integration with go-config for configuration management."),
 		gocli.WithConfigProvider(provider),
 	)
 
 	configCmd := gocli.NewCommand(
-		gocli.WithUse("config"),
+		gocli.WithName("config"),
 		gocli.WithShort("Show configuration values"),
 		gocli.WithRun(func(cmd *gocli.Command, args []string) error {
 			cfg := cmd.Config()
@@ -48,7 +48,7 @@ func main() {
 	)
 
 	connectCmd := gocli.NewCommand(
-		gocli.WithUse("connect"),
+		gocli.WithName("connect"),
 		gocli.WithShort("Connect to configured server"),
 		gocli.WithRun(func(cmd *gocli.Command, args []string) error {
 			cfg := cmd.Config()

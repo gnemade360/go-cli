@@ -9,9 +9,10 @@ import (
 )
 
 type Command struct {
-	use   string
-	short string
-	long  string
+	commandName string
+	aliases     []string
+	short       string
+	long        string
 
 	parent   *Command
 	commands []*Command
@@ -20,8 +21,8 @@ type Command struct {
 	run     CommandFunc
 	postRun CommandFunc
 
-	args      ArgsValidator
-	validArgs []string
+	argValidation ArgsValidator
+	allowedArgs   []string
 
 	configProvider configprovider.Provider
 
@@ -69,8 +70,8 @@ func (c *Command) ExecuteContext(ctx context.Context) error {
 		return err
 	}
 
-	if target.args != nil {
-		if err := target.args(target, targetArgs); err != nil {
+	if target.argValidation != nil {
+		if err := target.argValidation(target, targetArgs); err != nil {
 			return err
 		}
 	}
@@ -106,8 +107,15 @@ func (c *Command) findTarget(args []string) (*Command, []string, error) {
 	}
 
 	for _, cmd := range c.commands {
-		if cmd.use == args[0] {
+		if cmd.commandName == args[0] {
 			return cmd.findTarget(args[1:])
+		}
+
+		// Check aliases
+		for _, alias := range cmd.aliases {
+			if alias == args[0] {
+				return cmd.findTarget(args[1:])
+			}
 		}
 	}
 
@@ -130,8 +138,12 @@ func (c *Command) Context() context.Context {
 	return c.ctx
 }
 
-func (c *Command) Use() string {
-	return c.use
+func (c *Command) Name() string {
+	return c.commandName
+}
+
+func (c *Command) Aliases() []string {
+	return c.aliases
 }
 
 func (c *Command) Short() string {

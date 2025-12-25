@@ -31,9 +31,9 @@ import (
 
 func main() {
     rootCmd := gocli.NewCommand(
-        gocli.WithUse("greet"),
+        gocli.WithName("greet"),
         gocli.WithShort("Greet someone"),
-        gocli.WithArgs(gocli.ExactArgs(1)),
+        gocli.WithArgValidator(gocli.ExactArgs(1)),
         gocli.WithRun(func(cmd *gocli.Command, args []string) error {
             fmt.Printf("Hello, %s!\n", args[0])
             return nil
@@ -58,12 +58,13 @@ import (
 
 func main() {
     rootCmd := gocli.NewCommand(
-        gocli.WithUse("myapp"),
+        gocli.WithName("myapp"),
         gocli.WithShort("My awesome application"),
     )
 
     versionCmd := gocli.NewCommand(
-        gocli.WithUse("version"),
+        gocli.WithName("version"),
+        gocli.WithAlias("v", "ver"),
         gocli.WithShort("Print version information"),
         gocli.WithRun(func(cmd *gocli.Command, args []string) error {
             fmt.Println("v1.0.0")
@@ -101,7 +102,7 @@ func main() {
     )
 
     rootCmd := gocli.NewCommand(
-        gocli.WithUse("myapp"),
+        gocli.WithName("myapp"),
         gocli.WithShort("My awesome application"),
         gocli.WithConfigProvider(provider),
         gocli.WithRun(func(cmd *gocli.Command, args []string) error {
@@ -132,7 +133,7 @@ import (
 
 func main() {
     rootCmd := gocli.NewCommand(
-        gocli.WithUse("myapp"),
+        gocli.WithName("myapp"),
         gocli.WithShort("Application with lifecycle hooks"),
 
         gocli.WithPreRun(func(cmd *gocli.Command, args []string) error {
@@ -166,7 +167,7 @@ go-cli provides several built-in argument validators:
 Requires exactly N arguments:
 
 ```go
-gocli.WithArgs(gocli.ExactArgs(2))
+gocli.WithArgValidator(gocli.ExactArgs(2))
 ```
 
 ### MinimumNArgs
@@ -174,7 +175,7 @@ gocli.WithArgs(gocli.ExactArgs(2))
 Requires at least N arguments:
 
 ```go
-gocli.WithArgs(gocli.MinimumNArgs(1))
+gocli.WithArgValidator(gocli.MinimumNArgs(1))
 ```
 
 ### MaximumNArgs
@@ -182,7 +183,7 @@ gocli.WithArgs(gocli.MinimumNArgs(1))
 Requires at most N arguments:
 
 ```go
-gocli.WithArgs(gocli.MaximumNArgs(3))
+gocli.WithArgValidator(gocli.MaximumNArgs(3))
 ```
 
 ### RangeArgs
@@ -190,7 +191,7 @@ gocli.WithArgs(gocli.MaximumNArgs(3))
 Requires between min and max arguments:
 
 ```go
-gocli.WithArgs(gocli.RangeArgs(1, 3))
+gocli.WithArgValidator(gocli.RangeArgs(1, 3))
 ```
 
 ### OnlyValidArgs
@@ -199,8 +200,8 @@ Validates arguments against a list of valid values:
 
 ```go
 gocli.NewCommand(
-    gocli.WithValidArgs("start", "stop", "restart"),
-    gocli.WithArgs(gocli.OnlyValidArgs()),
+    gocli.WithAllowedArgs("start", "stop", "restart"),
+    gocli.WithArgValidator(gocli.OnlyValidArgs()),
 )
 ```
 
@@ -209,7 +210,7 @@ gocli.NewCommand(
 Combines multiple validators:
 
 ```go
-gocli.WithArgs(gocli.MatchAll(
+gocli.WithArgValidator(gocli.MatchAll(
     gocli.MinimumNArgs(1),
     gocli.MaximumNArgs(3),
 ))
@@ -219,7 +220,8 @@ gocli.WithArgs(gocli.MatchAll(
 
 ### Core Options
 
-- `WithUse(string)` - Set the command name and usage
+- `WithName(string)` - Set the command name and usage
+- `WithAlias(...string)` - Set command aliases (alternative names)
 - `WithShort(string)` - Set short description
 - `WithLong(string)` - Set long description
 - `WithRun(CommandFunc)` - Set the main execution function
@@ -228,8 +230,8 @@ gocli.WithArgs(gocli.MatchAll(
 
 ### Validation Options
 
-- `WithArgs(ArgsValidator)` - Set argument validator
-- `WithValidArgs(...string)` - Set valid argument list
+- `WithArgValidator(ArgsValidator)` - Set argument validator
+- `WithAllowedArgs(...string)` - Set valid argument list
 
 ### Integration Options
 
@@ -264,7 +266,8 @@ type ArgsValidator func(cmd *Command, args []string) error
 - `AddCommand(...*Command)` - Add subcommands
 - `Config() configprovider.Provider` - Get config provider (inherits from parent if not set)
 - `Context() context.Context` - Get execution context
-- `Use() string` - Get command name
+- `Name() string` - Get command name
+- `Aliases() []string` - Get command aliases
 - `Short() string` - Get short description
 - `Long() string` - Get long description
 

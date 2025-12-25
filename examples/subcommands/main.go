@@ -10,13 +10,14 @@ import (
 
 func main() {
 	rootCmd := gocli.NewCommand(
-		gocli.WithUse("toolbox"),
+		gocli.WithName("toolbox"),
 		gocli.WithShort("A CLI toolbox with multiple commands"),
 		gocli.WithLong("Toolbox demonstrates go-cli's subcommand capabilities."),
 	)
 
 	versionCmd := gocli.NewCommand(
-		gocli.WithUse("version"),
+		gocli.WithName("version"),
+		gocli.WithAlias("v", "ver"),
 		gocli.WithShort("Print version information"),
 		gocli.WithRun(func(cmd *gocli.Command, args []string) error {
 			fmt.Println("toolbox v1.0.0")
@@ -26,9 +27,9 @@ func main() {
 	)
 
 	echoCmd := gocli.NewCommand(
-		gocli.WithUse("echo"),
+		gocli.WithName("echo"),
 		gocli.WithShort("Echo the provided arguments"),
-		gocli.WithArgs(gocli.MinimumNArgs(1)),
+		gocli.WithArgValidator(gocli.MinimumNArgs(1)),
 		gocli.WithRun(func(cmd *gocli.Command, args []string) error {
 			fmt.Println(strings.Join(args, " "))
 			return nil
@@ -36,9 +37,10 @@ func main() {
 	)
 
 	uppercaseCmd := gocli.NewCommand(
-		gocli.WithUse("uppercase"),
+		gocli.WithName("uppercase"),
+		gocli.WithAlias("upper", "up"),
 		gocli.WithShort("Convert text to uppercase"),
-		gocli.WithArgs(gocli.MinimumNArgs(1)),
+		gocli.WithArgValidator(gocli.MinimumNArgs(1)),
 		gocli.WithRun(func(cmd *gocli.Command, args []string) error {
 			text := strings.Join(args, " ")
 			fmt.Println(strings.ToUpper(text))
@@ -47,9 +49,10 @@ func main() {
 	)
 
 	lowercaseCmd := gocli.NewCommand(
-		gocli.WithUse("lowercase"),
+		gocli.WithName("lowercase"),
+		gocli.WithAlias("lower", "low"),
 		gocli.WithShort("Convert text to lowercase"),
-		gocli.WithArgs(gocli.MinimumNArgs(1)),
+		gocli.WithArgValidator(gocli.MinimumNArgs(1)),
 		gocli.WithRun(func(cmd *gocli.Command, args []string) error {
 			text := strings.Join(args, " ")
 			fmt.Println(strings.ToLower(text))

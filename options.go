@@ -4,9 +4,15 @@ import "github.com/gnemade360/go-config/configprovider"
 
 type CommandOption func(*Command)
 
-func WithUse(use string) CommandOption {
+func WithName(name string) CommandOption {
 	return func(c *Command) {
-		c.use = use
+		c.commandName = name
+	}
+}
+
+func WithAlias(aliases ...string) CommandOption {
+	return func(c *Command) {
+		c.aliases = aliases
 	}
 }
 
@@ -40,15 +46,15 @@ func WithPostRun(postRun CommandFunc) CommandOption {
 	}
 }
 
-func WithArgs(validator ArgsValidator) CommandOption {
+func WithArgValidator(validator ArgsValidator) CommandOption {
 	return func(c *Command) {
-		c.args = validator
+		c.argValidation = validator
 	}
 }
 
-func WithValidArgs(validArgs ...string) CommandOption {
+func WithAllowedArgs(args ...string) CommandOption {
 	return func(c *Command) {
-		c.validArgs = validArgs
+		c.allowedArgs = args
 	}
 }
 

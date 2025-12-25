@@ -10,7 +10,7 @@ import (
 
 func main() {
 	rootCmd := gocli.NewCommand(
-		gocli.WithUse("lifecycle"),
+		gocli.WithName("lifecycle"),
 		gocli.WithShort("Demonstrates lifecycle hooks"),
 		gocli.WithLong("Shows how PreRun, Run, and PostRun hooks execute in sequence."),
 
@@ -48,7 +48,7 @@ func main() {
 	)
 
 	errorCmd := gocli.NewCommand(
-		gocli.WithUse("error"),
+		gocli.WithName("error"),
 		gocli.WithShort("Demonstrates error handling in hooks"),
 		gocli.WithPreRun(func(cmd *gocli.Command, args []string) error {
 			fmt.Println("🔧 [PreRun] Starting initialization...")
