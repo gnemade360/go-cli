@@ -1,6 +1,9 @@
 package gocli
 
-import "github.com/gnemade360/go-config/configprovider"
+import (
+	"github.com/gnemade360/go-cli/flags"
+	"github.com/gnemade360/go-config/configprovider"
+)
 
 type CommandOption func(*Command)
 
@@ -61,5 +64,11 @@ func WithAllowedArgs(args ...string) CommandOption {
 func WithConfigProvider(provider configprovider.Provider) CommandOption {
 	return func(c *Command) {
 		c.configProvider = provider
+	}
+}
+
+func WithFlags(schema flags.FlagSchema) CommandOption {
+	return func(c *Command) {
+		c.flagSchema = schema
 	}
 }

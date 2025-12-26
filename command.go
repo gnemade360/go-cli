@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gnemade360/go-cli/flags"
 	"github.com/gnemade360/go-config/configprovider"
 )
 
@@ -23,6 +24,9 @@ type Command struct {
 
 	argValidation ArgsValidator
 	allowedArgs   []string
+
+	flagSchema flags.FlagSchema
+	flagSet    *flags.FlagSet
 
 	configProvider configprovider.Provider
 
@@ -68,6 +72,14 @@ func (c *Command) ExecuteContext(ctx context.Context) error {
 	target, targetArgs, err := c.findTarget(args)
 	if err != nil {
 		return err
+	}
+
+	if target.flagSchema != nil {
+		target.flagSet = flags.NewFlagSet(target.flagSchema)
+		if err := target.flagSet.Parse(targetArgs); err != nil {
+			return err
+		}
+		targetArgs = target.flagSet.Args()
 	}
 
 	if target.argValidation != nil {
@@ -152,4 +164,8 @@ func (c *Command) Short() string {
 
 func (c *Command) Long() string {
 	return c.long
+}
+
+func (c *Command) Flags() *flags.FlagSet {
+	return c.flagSet
 }
